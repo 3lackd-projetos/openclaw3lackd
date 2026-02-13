@@ -1,12 +1,14 @@
 #!/bin/bash
 # OpenClaw Memory Cleanup Script
-# Run via cron: 0 3 * * 0 /root/.openclaw/workspace/scripts/memory-cleanup.sh
+# Run via cron (user openclaw): 0 3 * * 0 /opt/openclaw3lackd/memory-cleanup.sh
 
-WORKSPACE="/root/.openclaw/workspace"
+# Assuming run as user 'openclaw'
+WORKSPACE="$HOME/.openclaw/workspace"
 MEMORY_DIR="$WORKSPACE/memory"
 ARCHIVE_DIR="$MEMORY_DIR/archive"
 MEMORY_FILE="$WORKSPACE/MEMORY.md"
-LOG_FILE="/var/log/openclaw-memory.log"
+# Use a log file in the user's home or a writable location
+LOG_FILE="$HOME/openclaw-memory.log"
 MAX_MEMORY_CHARS=8000
 ARCHIVE_DAYS=7
 
@@ -16,9 +18,13 @@ mkdir -p "$ARCHIVE_DIR"
 echo "$(date '+%Y-%m-%d %H:%M') — Memory cleanup started" >> "$LOG_FILE"
 
 # 1. Archive old daily memory files (> 7 days)
-ARCHIVED=$(find "$MEMORY_DIR" -maxdepth 1 -name "*.md" -mtime +$ARCHIVE_DAYS -exec mv {} "$ARCHIVE_DIR/" \; -print | wc -l)
-if [ "$ARCHIVED" -gt 0 ]; then
-    echo "  Archived $ARCHIVED files older than $ARCHIVE_DAYS days" >> "$LOG_FILE"
+if [ -d "$MEMORY_DIR" ]; then
+    ARCHIVED=$(find "$MEMORY_DIR" -maxdepth 1 -name "*.md" -mtime +$ARCHIVE_DAYS -exec mv {} "$ARCHIVE_DIR/" \; -print | wc -l)
+    if [ "$ARCHIVED" -gt 0 ]; then
+        echo "  Archived $ARCHIVED files older than $ARCHIVE_DAYS days" >> "$LOG_FILE"
+    fi
+else
+    echo "  Memory directory not found: $MEMORY_DIR" >> "$LOG_FILE"
 fi
 
 # 2. Check MEMORY.md size
@@ -45,16 +51,18 @@ if [ "$(date +%u)" = "7" ]; then
         echo "" >> "$WEEKLY_FILE"
         
         # Consolidate this week's daily files
-        for f in "$MEMORY_DIR"/$(date -d "7 days ago" +%Y-%m)*.md "$MEMORY_DIR"/$(date +%Y-%m)*.md; do
-            if [ -f "$f" ]; then
-                echo "---" >> "$WEEKLY_FILE"
-                echo "## $(basename "$f" .md)" >> "$WEEKLY_FILE"
-                cat "$f" >> "$WEEKLY_FILE"
-                echo "" >> "$WEEKLY_FILE"
-            fi
-        done
-        
-        echo "  Created weekly consolidation: $WEEKLY_FILE" >> "$LOG_FILE"
+        if [ -d "$MEMORY_DIR" ]; then
+            for f in "$MEMORY_DIR"/$(date -d "7 days ago" +%Y-%m)*.md "$MEMORY_DIR"/$(date +%Y-%m)*.md; do
+                if [ -f "$f" ]; then
+                    echo "---" >> "$WEEKLY_FILE"
+                    echo "## $(basename "$f" .md)" >> "$WEEKLY_FILE"
+                    cat "$f" >> "$WEEKLY_FILE"
+                    echo "" >> "$WEEKLY_FILE"
+                fi
+            done
+            
+            echo "  Created weekly consolidation: $WEEKLY_FILE" >> "$LOG_FILE"
+        fi
     fi
 fi
 

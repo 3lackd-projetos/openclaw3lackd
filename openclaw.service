@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=root
+User=openclaw
 WorkingDirectory=/opt/openclaw3lackd
 ExecStart=/usr/bin/node scripts/run-node.mjs gateway
 Restart=always
