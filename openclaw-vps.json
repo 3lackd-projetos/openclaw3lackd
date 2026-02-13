@@ -89,7 +89,7 @@
           "alias": "Command R Latest"
         }
       },
-      "workspace": "/root/.openclaw/workspace",
+      "workspace": "/home/openclaw/.openclaw/workspace",
       "compaction": {
         "mode": "safeguard",
         "reserveTokensFloor": 30000,
@@ -181,7 +181,7 @@
     }
   },
   "gateway": {
-    "port": 18789,
+    "port": 18790,
     "mode": "local",
     "bind": "loopback",
     "auth": {
