@@ -75,3 +75,6 @@ USER.md
 memory/
 .agent/*.json
 !.agent/workflows/
+
+# 3lackd projeto config (contains API keys)
+3lackd_projeto/
