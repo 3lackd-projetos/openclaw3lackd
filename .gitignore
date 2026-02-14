@@ -86,3 +86,5 @@ USER.md
 # 3lackd projeto config (contains API keys)
 3lackd_projeto/
 local/
+/local/
+package-lock.json
