@@ -120,3 +120,8 @@ dist/protocol.schema.json
 
 # Synthing
 **/.stfolder/
+
+# 3lackd Projeto (Sensitive)
+3lackd_projeto/
+openclaw.json
+3lackd_projetos/
